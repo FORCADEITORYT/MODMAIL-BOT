@@ -1,40 +1,48 @@
+require('dotenv').config();
+const Discord = require("discord.js");
+require('dotenv').config();
+
+const keepAlive = require('./server');
+const Monitor = require('ping-monitor');
+ 
+keepAlive();
+const monitor = new Monitor({
+    website: 'https://bot-prueba-2.tomasgonzalez10.repl.co',
+    title: 'Secundario',
+    interval: 1 // seconds
+});
+
+
+//////////////////////////MONITOR///////////////////////////
+
+monitor.on('up', (res) => console.log(`${res.website} está encedido.`));
+monitor.on('down', (res) => console.log(`${res.website} se ha caído - ${res.statusMessage}`));
+monitor.on('stop', (website) => console.log(`${website} se ha parado.`) );
+monitor.on('error', (error) => console.log(error));
+
+
+///////////////////////////BOT//////////////////////////////
 const discord = require("discord.js");
 const client = new discord.Client()
 const { token, prefix, ServerID } = require("./config.json")
 
 
 
-
 client.on("ready", () => {
-    console.log("I am ready to receive and Send Mails :D")
+console.log("I am ready to receive and Send Mails :D")
+
+
+client.user.setActivity("Watching My DM's", {
+    type: "STREAMING",
+    url: "https://www.twitch.tv/unknown"
+  })
+})
     
-    
-    client.user.setActivity("Watching My DM's", {
-        type: "STREAMING",
-        url: "https://www.twitch.tv/unknown"
-      })
-    })
-    
-
-
-
-
-
-
-
-
 client.on("channelDelete", (channel) => {
     if(channel.parentID == channel.guild.channels.cache.find((x) => x.name == "|I{•------» 𝕄𝕆𝔻𝕄𝔸𝕀𝕃 «------•}I|").id) {
         const person = channel.guild.members.cache.find((x) => x.id == channel.name)
 
-        if(!person) return;
-
-        let yembed = new discord.MessageEmbed()
-        .setAuthor("MAIL DELETED", client.user.displayAvatarURL())
-        .setColor('RED')
-        .setThumbnail(client.user.displayAvatarURL())
-        .setDescription("Your mail is deleted by moderator and if you have any problem with that you can open mail again by sending message here.")
-    return person.send(yembed)
+      
     
     }
 
@@ -47,6 +55,7 @@ client.on("message", async message => {
 
   let args = message.content.slice(prefix.length).split(' ');
   let command = args.shift().toLowerCase();
+
 
 
   if(message.guild) {
@@ -70,7 +79,7 @@ client.on("message", async message => {
 
           await message.guild.channels.create("|I{•------» 𝕄𝕆𝔻𝕄𝔸𝕀𝕃 «------•}I|", {
               type: "category",
-              topic: "All the mail will be here :D",
+              topic: "All the mail will be here ",
               permissionOverwrites: [
                   {
                       id: role.id,
@@ -84,7 +93,7 @@ client.on("message", async message => {
           })
 
 
-          return message.channel.send("Setup is Completed :D")
+          return message.channel.send("Setup is Completed ")
 
       } else if(command == "close") {
 
@@ -100,11 +109,10 @@ client.on("message", async message => {
             await message.channel.delete()
 
             let yembed = new discord.MessageEmbed()
-            .setAuthor("MAIL CLOSED", client.user.displayAvatarURL())
+            .setAuthor("Thread Closed")
             .setColor("RED")
-            .setThumbnail(client.user.displayAvatarURL())
-            .setFooter("Mail is closed by " + message.author.username)
-            if(args[0]) yembed.setDescription(args.join(" "))
+            .setFooter("Replying will create a new thread")
+            .setDescription(`${message.author} has closed the Modmail Thread`)
 
             return person.send(yembed)
 
@@ -134,7 +142,7 @@ client.on("message", async message => {
           const channel = await message.guild.channels.create(target.id, {
               type: "text",
             parent: category.id,
-            topic: "Mail is Direct Opened by **" + message.author.username + "** to make contact with " + message.author.tag
+            topic: "Thread is Direct Opened by **" + message.author.username + "** to make contact with " + message.author.tag
           })
 
           let nembed = new discord.MessageEmbed()
@@ -149,7 +157,7 @@ client.on("message", async message => {
           channel.send(nembed)
 
           let uembed = new discord.MessageEmbed()
-          .setAuthor("DIRECT MAIL OPENED")
+          .setAuthor("Direct Thread Opened")
           .setColor("GREEN")
           .setThumbnail(client.user.displayAvatarURL())
           .setDescription("You have been contacted by Supporter of **" + message.guild.name + "**, Please wait until he send another message to you!");
@@ -158,7 +166,7 @@ client.on("message", async message => {
           target.send(uembed);
 
           let newEmbed = new discord.MessageEmbed()
-          .setDescription("Opened The Mail: <#" + channel + ">")
+          .setDescription("Opened The Thread: <#" + channel + ">")
           .setColor("GREEN");
 
           return message.channel.send(newEmbed);
@@ -168,7 +176,7 @@ client.on("message", async message => {
           .setColor("RANDOM")
 
           
-        .setDescription("Some Text Here")
+        .setDescription("This bot is made by FORCADEITOR")
         .addField(prefix + "setup", "Setup the modmail system (This is not for multiple server.)", true)
         .addField(prefix + "open", 'Let you open the mail to contact anyone with his ID', true)
         .setThumbnail(client.user.displayAvatarURL())
@@ -176,6 +184,12 @@ client.on("message", async message => {
 
                     return message.channel.send(embed)
           
+      } else if(command == "ping") {
+        let embed = new discord.MessageEmbed()
+          .setColor("BLUE")
+          .setDescription(`🏓 Bot's Latency is ${message.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`)
+
+        message.channel.send(embed)
       }
   } 
   
@@ -204,11 +218,10 @@ client.on("message", async message => {
     
     
       } 
-
   if(!message.guild) {
+    await message.react("✅");
       const guild = await client.guilds.cache.get(ServerID);
       if(!guild) return;
-
       const main = guild.channels.cache.find((x) => x.name == message.author.id)
       const category = guild.channels.cache.find((x) => x.name == "|I{•------» 𝕄𝕆𝔻𝕄𝔸𝕀𝕃 «------•}I|")
 
@@ -221,10 +234,11 @@ client.on("message", async message => {
           })
 
           let sembed = new discord.MessageEmbed()
-          .setAuthor("MAIN OPENED")
+          .setAuthor("Thread Opened")
           .setColor("GREEN")
-          .setThumbnail(client.user.displayAvatarURL())
-          .setDescription("Conversation is now started, you will be contacted by supporters soon :D")
+           .setThumbnail(client.user.displayAvatarURL())
+          .setDescription("The staff team will get back to you as soon as possible. Please don't forget to read <#805020548429381632>")
+          .setFooter("Your message has been sent")
 
           message.author.send(sembed)
 
@@ -252,6 +266,5 @@ client.on("message", async message => {
 
   } 
 })
-
 
 client.login(token)
