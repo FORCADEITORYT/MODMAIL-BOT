@@ -1,6 +1,10 @@
 require('dotenv').config();
 const Discord = require("discord.js");
 require('dotenv').config();
+///////////////////////////BOT//////////////////////////////
+require('dotenv').config();
+const Discord = require("discord.js");
+require('dotenv').config();
 
 const keepAlive = require('./server');
 const Monitor = require('ping-monitor');
@@ -51,6 +55,7 @@ client.on("channelDelete", (channel) => {
 
 
 client.on("message", async message => {
+  
   if(message.author.bot) return;
 
   let args = message.content.slice(prefix.length).split(' ');
@@ -95,6 +100,14 @@ client.on("message", async message => {
 
           return message.channel.send("Setup is Completed ")
 
+      } else if (command === "slowmode") {
+         let rate = await message.channel.setRateLimitPerUser(5, ["test"]) ;
+
+         let embed = new discord.MessageEmbed()
+         .setColor('BLUE')
+         .setDescription(`The slowmode has been changed to ${message.channel.rateLimitPerUser}`);
+
+         message.channel.send(embed);
       } else if(command == "close") {
 
 
