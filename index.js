@@ -1,32 +1,5 @@
 require('dotenv').config();
 const Discord = require("discord.js");
-require('dotenv').config();
-///////////////////////////BOT//////////////////////////////
-require('dotenv').config();
-const Discord = require("discord.js");
-require('dotenv').config();
-
-const keepAlive = require('./server');
-const Monitor = require('ping-monitor');
- 
-keepAlive();
-const monitor = new Monitor({
-    website: 'https://bot-prueba-2.tomasgonzalez10.repl.co',
-    title: 'Secundario',
-    interval: 1 // seconds
-});
-
-
-//////////////////////////MONITOR///////////////////////////
-
-monitor.on('up', (res) => console.log(`${res.website} está encedido.`));
-monitor.on('down', (res) => console.log(`${res.website} se ha caído - ${res.statusMessage}`));
-monitor.on('stop', (website) => console.log(`${website} se ha parado.`) );
-monitor.on('error', (error) => console.log(error));
-
-
-///////////////////////////BOT//////////////////////////////
-const discord = require("discord.js");
 const client = new discord.Client()
 const { token, prefix, ServerID } = require("./config.json")
 
